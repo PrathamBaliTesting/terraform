@@ -4,15 +4,15 @@ variable "vpc_region" {
 }
 
 
-variable "prod_vpc_cidr" {
+variable "vpc_cidr" {
   description = "VPC CIDR Block"
 }
 
-variable "prod_public_subnet_cidr" {
+variable "public_subnet_cidr" {
   description = "Public Subnet CIDR"
 }
 
-variable "prod_private_subnet_cidr" {
+variable "private_subnet_cidr" {
   description = "Private Subnet CIDR"
 }
 
