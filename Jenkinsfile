@@ -63,14 +63,14 @@ pipeline {
 def terraformAction(env, action) {
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_access_key']]) {
         bat """
-            echo "Running Terraform ${action} for ${env} environment"
+            echo Running Terraform ${action} for ${env} environment
             terraform init
             terraform plan -var="availability_zone=${AWS_REGION}"
-            if [ "${action}" == "apply" ]; then
+            if "%action%" == "apply" (
                 terraform apply -auto-approve -var="availability_zone=${AWS_REGION}"
-            elif [ "${action}" == "destroy" ]; then
+            ) else (
                 terraform destroy -auto-approve -var="availability_zone=${AWS_REGION}"
-            fi
+            )
         """
     }
 }
