@@ -34,7 +34,7 @@ pipeline {
 }
 
 def terraformAction(env) {
-    sh """
+    bat """
         terraform init
         terraform plan -var='region=${AWS_REGION}'
         terraform apply -auto-approve -var='region=${AWS_REGION}'
