@@ -24,10 +24,8 @@ pipeline {
         stage('Approve Destroy') {
             steps {
                 script {
-                    try {
-                        input message: 'Do you want to proceed with Terraform destroy?', timeout: 1*60, timeoutMessage: 'Approval timed out. Aborting the build.'
-                    } catch (err) {
-                        error 'Terraform destroy was not approved in time.'
+                    timeout(time: 1, unit: 'MINUTES') {
+                        input message: 'Do you want to proceed with Terraform destroy?'
                     }
                 }
             }
