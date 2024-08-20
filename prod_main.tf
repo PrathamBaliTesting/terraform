@@ -1,49 +1,65 @@
-
 provider "aws" {
   region = "us-east-1"
 }
 
-
+# VPC
 resource "aws_vpc" "production" {
-  cidr_block = var.vpc_cidr
+  cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
+  enable_dns_support   = true
   tags = {
-    Name = "Production"
+    Name = "Production-VPC"
   }
 }
 
-#Public Subnet
-
+# Public Subnet
 resource "aws_subnet" "public-subnet" {
-  cidr_block = var.public_subnet_cidr
-  vpc_id     = aws_vpc.production.id
+  cidr_block        = var.public_subnet_cidr
+  vpc_id            = aws_vpc.production.id
   map_public_ip_on_launch = true
-  availability_zone = var.availability_zone
-  
-  
+  availability_zone = "us-east-1a"
   tags = {
-    Name = "Public-Subent"
+    Name = "Public-Subnet"
   }
 }
 
-#Private Subnet
+# Private Subnet
 resource "aws_subnet" "private-subnet" {
-  cidr_block = var.private_subnet_cidr
-  vpc_id     = aws_vpc.production.id
-  availability_zone = var.availability_zone
-  
+  cidr_block        = var.private_subnet_cidr
+  vpc_id            = aws_vpc.production.id
+  availability_zone = "us-east-1b"
   tags = {
-    Name = "Private-Subent"
+    Name = "Private-Subnet"
+  }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "production-igw" {
+  vpc_id = aws_vpc.production.id
+  tags = {
+    Name = "Production-IGW"
   }
 }
 
 # Public Route Table
-
 resource "aws_route_table" "public-route-table" {
   vpc_id = aws_vpc.production.id
   tags = {
     Name = "Public-Route-Table"
   }
+}
+
+# Route for Public Subnet to Internet
+resource "aws_route" "public-internet-gw-route" {
+  route_table_id         = aws_route_table.public-route-table.id
+  gateway_id             = aws_internet_gateway.production-igw.id
+  destination_cidr_block = "0.0.0.0/0"
+}
+
+# Associate Public Subnet with Route Table
+resource "aws_route_table_association" "public-subnet-association" {
+  route_table_id = aws_route_table.public-route-table.id
+  subnet_id      = aws_subnet.public-subnet.id
 }
 
 # Private Route Table
@@ -54,22 +70,9 @@ resource "aws_route_table" "private-route-table" {
   }
 }
 
-# Associate Public Subnet with Route Table
-resource "aws_route_table_association" "public-subnet-association" {
-  route_table_id = aws_route_table.public-route-table.id
-  subnet_id      = aws_subnet.public-subnet.id
-}
-
-# Associate Private Subnet with Route Table
-resource "aws_route_table_association" "private-subnet-association" {
-  route_table_id = aws_route_table.private-route-table.id
-  subnet_id      = aws_subnet.private-subnet.id
-}
-
 # Elastic IP for NAT Gateway
 resource "aws_eip" "eip" {
-  domain= "vpc"
-  associate_with_private_ip = "10.0.2.0/16"
+  domain = "vpc"
   tags = {
     Name = "Production-EIP"
   }
@@ -85,26 +88,17 @@ resource "aws_nat_gateway" "nat-gw" {
   depends_on = [aws_eip.eip]
 }
 
-# Internet Gateway
-resource "aws_internet_gateway" "production-igw" {
-  vpc_id = aws_vpc.production.id
-  tags = {
-    Name = "Production-IGW"
-  }
-}
-
-# Route for Public Subnet to Internet
-resource "aws_route" "public-internet-gw-route" {
-  route_table_id = aws_route_table.public-route-table.id
-  gateway_id = aws_internet_gateway.production-igw.id
-  destination_cidr_block = "0.0.0.0/0"
-}
-
 # Route for Private Subnet to NAT Gateway
 resource "aws_route" "nat-gw-route" {
   route_table_id         = aws_route_table.private-route-table.id
   nat_gateway_id         = aws_nat_gateway.nat-gw.id
   destination_cidr_block = "0.0.0.0/0"
+}
+
+# Associate Private Subnet with Route Table
+resource "aws_route_table_association" "private-subnet-association" {
+  route_table_id = aws_route_table.private-route-table.id
+  subnet_id      = aws_subnet.private-subnet.id
 }
 
 # Security Group for Backend Instances
@@ -124,7 +118,7 @@ resource "aws_security_group" "backend_sg" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
-}
+  }
 
   egress {
     from_port   = 0
@@ -138,3 +132,27 @@ resource "aws_security_group" "backend_sg" {
   }
 }
 
+# Output Values
+output "vpc_id" {
+  value = aws_vpc.production.id
+}
+
+output "public_subnet_id" {
+  value = aws_subnet.public-subnet.id
+}
+
+output "private_subnet_id" {
+  value = aws_subnet.private-subnet.id
+}
+
+output "nat_gateway_id" {
+  value = aws_nat_gateway.nat-gw.id
+}
+
+output "internet_gateway_id" {
+  value = aws_internet_gateway.production-igw.id
+}
+
+output "backend_security_group_id" {
+  value = aws_security_group.backend_sg.id
+}
