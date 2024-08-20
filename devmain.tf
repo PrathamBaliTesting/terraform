@@ -11,7 +11,7 @@ resource "aws_vpc" "main" {
   enable_dns_support = true
   
   tags={
-    Name="Development"
+    Name="development-be-vpc"
   }
 }
 
@@ -25,7 +25,7 @@ resource "aws_subnet" "public_subnet" {
   
 
   tags={
-    Name="Public Subnet"
+    Name="development-be-public-subnet"
   }
 }
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = var.availability_zone
   
   tags={
-    Name="Private Subnet"
+    Name="development-be-private-subnet"
   }
 }
 
@@ -51,7 +51,7 @@ resource "aws_route_table" "public_rt" {
   }
 
   tags = {
-    Name = "dev-Public-Route-Table"
+    Name = "development-be-public-rt"
   }
   
 }
@@ -69,7 +69,7 @@ resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
 
   tags={
-    Name="Development_IG"
+    Name="development-be-ig"
   }
   
 }
@@ -78,7 +78,7 @@ resource "aws_internet_gateway" "main" {
 resource "aws_security_group" "sg_grp" {
   vpc_id = aws_vpc.main.id
   name   = "http_access"
-  description = "Secuirty Groups Modules"
+  description = "sg for backend development"
 
   #This is For SSH
   ingress {
@@ -106,7 +106,7 @@ resource "aws_security_group" "sg_grp" {
   }
 
   tags = {
-    Name= "Dev-sg"
+    Name= "development-be-sg"
   }
 
 }
