@@ -30,11 +30,7 @@ pipeline {
         }
     }
 
-    post {
-        always {
-            cleanWs()
-        }
-    }
+   
 }
 
 def terraformAction(env) {
