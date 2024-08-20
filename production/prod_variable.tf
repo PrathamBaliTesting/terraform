@@ -17,6 +17,6 @@ variable "private_subnet_cidr" {
 variable "availability_zone" {
   description = "Availability Zone for the development environment"
   type        = string
-  default     = "us-east-1"  # Update as needed
+  default     = "us-east-1a"  # Update as needed
 }
 
