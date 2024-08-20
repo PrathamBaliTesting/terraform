@@ -8,7 +8,7 @@ resource "aws_vpc" "production" {
   enable_dns_hostnames = true
   enable_dns_support   = true
   tags = {
-    Name = "Production-VPC"
+    Name = "production-be"
   }
 }
 
@@ -19,7 +19,7 @@ resource "aws_subnet" "public-subnet" {
   map_public_ip_on_launch = true
   availability_zone = "us-east-1a"
   tags = {
-    Name = "Public-Subnet"
+    Name = "production-be-public-subnet"
   }
 }
 
@@ -29,7 +29,7 @@ resource "aws_subnet" "private-subnet" {
   vpc_id            = aws_vpc.production.id
   availability_zone = "us-east-1b"
   tags = {
-    Name = "Private-Subnet"
+    Name = "production-be-private-subnet"
   }
 }
 
@@ -37,7 +37,7 @@ resource "aws_subnet" "private-subnet" {
 resource "aws_internet_gateway" "production-igw" {
   vpc_id = aws_vpc.production.id
   tags = {
-    Name = "Production-IGW"
+    Name = "production-be-igw"
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_internet_gateway" "production-igw" {
 resource "aws_route_table" "public-route-table" {
   vpc_id = aws_vpc.production.id
   tags = {
-    Name = "Public-Route-Table"
+    Name = "production-be-public-rt"
   }
 }
 
@@ -66,7 +66,7 @@ resource "aws_route_table_association" "public-subnet-association" {
 resource "aws_route_table" "private-route-table" {
   vpc_id = aws_vpc.production.id
   tags = {
-    Name = "Private-Route-Table"
+    Name = "production-be-private-rt"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_route_table" "private-route-table" {
 resource "aws_eip" "eip" {
   domain = "vpc"
   tags = {
-    Name = "Production-EIP"
+    Name = "production-be-eip"
   }
 }
 
@@ -83,7 +83,7 @@ resource "aws_nat_gateway" "nat-gw" {
   allocation_id = aws_eip.eip.id
   subnet_id     = aws_subnet.public-subnet.id
   tags = {
-    Name = "Production-NAT-GW"
+    Name = "production-be-nat-gw"
   }
   depends_on = [aws_eip.eip]
 }
@@ -104,7 +104,7 @@ resource "aws_route_table_association" "private-subnet-association" {
 # Security Group for Backend Instances
 resource "aws_security_group" "backend_sg" {
   vpc_id = aws_vpc.production.id
-  name   = "backend-sg"
+  name   = "production-be-sg"
 
   ingress {
     from_port   = 80
@@ -128,6 +128,6 @@ resource "aws_security_group" "backend_sg" {
   }
 
   tags = {
-    Name = "Backend-SG"
+    Name = "production-be-sg"
   }
 }
