@@ -131,28 +131,3 @@ resource "aws_security_group" "backend_sg" {
     Name = "Backend-SG"
   }
 }
-
-# Output Values
-output "vpc_id" {
-  value = aws_vpc.production.id
-}
-
-output "public_subnet_id" {
-  value = aws_subnet.public-subnet.id
-}
-
-output "private_subnet_id" {
-  value = aws_subnet.private-subnet.id
-}
-
-output "nat_gateway_id" {
-  value = aws_nat_gateway.nat-gw.id
-}
-
-output "internet_gateway_id" {
-  value = aws_internet_gateway.production-igw.id
-}
-
-output "backend_security_group_id" {
-  value = aws_security_group.backend_sg.id
-}
