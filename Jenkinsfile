@@ -34,9 +34,12 @@ pipeline {
 }
 
 def terraformAction(env) {
+     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_access_key']]){
+    
     bat """
         terraform init
         terraform plan -var="availability_zone=us-east-1"
         terraform apply -auto-approve -var="availability_zone=us-east-1"
         """
+     }
 }
