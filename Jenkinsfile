@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: 'DEV-BE', credentialsId: 'GitHUB', url: 'https://github.com/PrathamBaliTesting/terraform.git'
+                git branch: 'main', credentialsId: 'GitHUB', url: 'https://github.com/PrathamBaliTesting/terraform.git'
             }
         }
         stage('Terraform Init') {
