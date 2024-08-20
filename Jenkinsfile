@@ -29,17 +29,15 @@ pipeline {
             }
         }
     }
-
-   
 }
 
 def terraformAction(env) {
-     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_access_key']]){
-    
-    bat """
-        terraform init
-        terraform plan -var="availability_zone=us-east-1"
-        terraform apply -auto-approve -var="availability_zone=us-east-1"
+    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_access_key']]) {
+        bat """
+            echo "Running Terraform for ${env} environment"
+            terraform init
+            terraform plan -var="availability_zone=${AWS_REGION}"
+            terraform apply -auto-approve -var="availability_zone=${AWS_REGION}"
         """
-     }
+    }
 }
