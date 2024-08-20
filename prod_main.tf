@@ -26,7 +26,7 @@ resource "prod_aws_subnet" "public-subnet" {
 resource "prod_aws_subnet" "private-subnet" {
   cidr_block = var.prod_private_subnet_cidr
   vpc_id     = aws_vpc.production.id
-  availability_zone = "ap-south-1a"
+  availability_zone = "us-east-1"
   tags = {
     Name = "Private-Subent"
   }
