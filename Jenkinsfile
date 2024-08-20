@@ -28,16 +28,44 @@ pipeline {
                 }
             }
         }
+
+        stage('User Confirmation') {
+            steps {
+                script {
+                    def userInput = input(
+                        message: 'Do you want to destroy the resources in both environments?',
+                        parameters: [
+                            [$class: 'BooleanParameterDefinition', defaultValue: false, description: 'Select this to destroy the resources in both environments.', name: 'Destroy']
+                        ]
+                    )
+
+                    if (userInput) {
+                        echo 'User confirmed. Proceeding to destroy both environments...'
+                        dir('development') {
+                            script {
+                                terraformAction('development', 'destroy')
+                            }
+                        }
+                        dir('production') {
+                            script {
+                                terraformAction('production', 'destroy')
+                            }
+                        }
+                    } else {
+                        echo 'User chose not to destroy resources. Pipeline will end.'
+                    }
+                }
+            }
+        }
     }
 }
 
-def terraformAction(env) {
+def terraformAction(env, action = 'apply') {
     withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_access_key']]) {
         bat """
-            echo "Running Terraform for ${env} environment"
+            echo "Running Terraform ${action} for ${env} environment"
             terraform init
-            terraform plan -var="availability_zone=${AWS_REGION}"
-            terraform apply -auto-approve -var="availability_zone=${AWS_REGION}"
+            terraform ${action} -var="availability_zone=us-east-1a"
         """
     }
 }
