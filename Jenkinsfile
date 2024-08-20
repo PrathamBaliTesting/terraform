@@ -65,12 +65,13 @@ def terraformAction(env, action) {
         bat """
             echo Running Terraform ${action} for ${env} environment
             terraform init
-            terraform plan -var="availability_zone=${AWS_REGION}"
+            terraform plan -var="availability_zone=${AWS_REGION}" -out=tfplan
             if "%action%" == "apply" (
-                terraform apply -auto-approve -var="availability_zone=${AWS_REGION}"
+                terraform apply -auto-approve tfplan
             ) else (
                 terraform destroy -auto-approve -var="availability_zone=${AWS_REGION}"
             )
         """
     }
 }
+
