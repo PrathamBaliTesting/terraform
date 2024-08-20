@@ -64,7 +64,7 @@ resource "aws_route_table_association" "private-subnet-association" {
 
 #elastic IP
 resource "aws_eip" "eip" {
-  vpc = true
+  domain= "vpc"
   associate_with_private_ip = "10.0.2.0/16"
   tags = {
     Name = "Production-EIP"
