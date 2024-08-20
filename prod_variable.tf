@@ -1,8 +1,3 @@
-variable "vpc_region" {
-  default     = "us-east-1"
-  description = "AWS Region"
-}
-
 
 variable "vpc_cidr" {
   description = "VPC CIDR Block"
@@ -17,5 +12,11 @@ variable "public_subnet_cidr" {
 variable "private_subnet_cidr" {
   description = "Private Subnet CIDR"
   default = "10.0.2.0/24" 
+}
+
+variable "availability_zone" {
+  description = "Availability Zone for the development environment"
+  type        = string
+  default     = "us-east-1"  # Update as needed
 }
 
