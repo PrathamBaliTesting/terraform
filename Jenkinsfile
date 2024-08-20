@@ -1,41 +1,46 @@
 pipeline {
     agent any
-    tools {
-        terraform 'TERRAFORM_HOME'
+
+    environment {
+        AWS_REGION = 'us-west-2'
     }
+
     stages {
-        stage('Git Checkout') {
-            steps {
-                git branch: 'main', credentialsId: 'GitHUB', url: 'https://github.com/PrathamBaliTesting/terraform.git'
-            }
-        }
-        stage('Terraform Init') {
-            steps {
-                bat 'terraform init'
-            }
-        }
-        stage('Terraform Apply') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_access_key']]) {
-                    bat 'terraform apply --auto-approve'
+        stage('Run Terraform for Both Environments') {
+            parallel {
+                stage('Development') {
+                    steps {
+                        dir('development') {
+                            script {
+                                terraformAction('development')
+                            }
+                        }
+                    }
                 }
-            }
-        }
-        stage('Approve Destroy') {
-            steps {
-                  script {
-                    timeout(time: 1, unit: 'MINUTES') {
-                        input message: 'Do you want to proceed with Terraform destroy?'
+                stage('Production') {
+                    steps {
+                        dir('production') {
+                            script {
+                                terraformAction('production')
+                            }
+                        }
                     }
                 }
             }
         }
-        stage('Destroy Infrastructure') {
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws_access_key']]) {
-                    bat 'terraform destroy --auto-approve'
-                }
-            }
+    }
+
+    post {
+        always {
+            cleanWs()
         }
     }
+}
+
+def terraformAction(env) {
+    sh """
+        terraform init
+        terraform plan -var='region=${AWS_REGION}'
+        terraform apply -auto-approve -var='region=${AWS_REGION}'
+    """
 }
