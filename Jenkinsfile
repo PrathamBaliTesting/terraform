@@ -68,7 +68,7 @@ def terraformAction(env, action) {
             terraform plan -var="availability_zone=${AWS_REGION}" -out=tfplan
             if "%action%" == "apply" (
                 terraform apply -auto-approve tfplan
-            ) else (
+            ) else if "%action%" == "destroy" (
                 terraform destroy -auto-approve -var="availability_zone=${AWS_REGION}"
             )
         """
